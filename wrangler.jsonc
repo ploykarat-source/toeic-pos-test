@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "toeic-pos-mastery",
+  "compatibility_date": "2026-06-16",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "directory": "Part Of Speech Test"
+  },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ]
+}
