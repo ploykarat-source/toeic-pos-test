@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TOEIC Part of Speech Mastery - ระบบเตรียมสอบไต่ระดับอัจฉริยะ</title>
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- APP HEADER & NAVIGATION -->
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div class="logo-text">
+          <h1>TOEIC POS Mastery</h1>
+          <p>ระบบเรียนรู้และทดสอบไต่ระดับ Part of Speech</p>
+        </div>
+      </div>
+      
+      <div class="nav-controls">
+        <nav class="nav-menu" id="main-nav" style="display: none;">
+          <button class="nav-tab active" data-target="dashboard">
+            <i class="fa-solid fa-chart-pie"></i> แดชบอร์ด
+          </button>
+          <button class="nav-tab" data-target="guide">
+            <i class="fa-solid fa-book-open"></i> บทเรียน & ทฤษฎี
+          </button>
+          <button class="nav-tab" data-target="videos">
+            <i class="fa-solid fa-play"></i> วิดีโอติว
+          </button>
+        </nav>
+        
+        <!-- User profile panel -->
+        <div id="user-profile-panel" style="display: none; align-items: center; gap: 0.5rem; background: var(--panel-bg); padding: 0.35rem 0.75rem; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); font-size: 0.85rem;">
+          <i class="fa-solid fa-circle-user" style="color: var(--accent-color);"></i>
+          <span id="user-display-name" style="font-weight: 600;">Guest</span>
+          <button id="btn-logout" title="ออกจากระบบ" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; padding: 0 0.25rem;">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+        
+        <button class="theme-toggle" id="btn-theme-toggle" title="สลับโหมด มืด/สว่าง">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN SECTIONS -->
+    <main>
+      
+      <!-- ================= SECTION 0: AUTHENTICATION ================= -->
+      <section id="auth" class="content-section active">
+        <div style="max-width: 450px; margin: 3rem auto; display: flex; flex-direction: column; gap: 1.5rem;">
+          <div class="glass-panel" style="padding: 2.5rem; text-align: center; display: flex; flex-direction: column; gap: 1.5rem; position: relative;">
+            <div style="width: 70px; height: 70px; background: var(--accent-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; color: white; font-size: 2rem; box-shadow: 0 4px 15px var(--accent-glow);">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            
+            <div>
+              <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">เข้าสู่ระบบสมาชิก</h2>
+              <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5;">กรุณากรอกชื่อผู้ใช้งานเพื่อเริ่มต้นเตรียมสอบ ประวัติคะแนนและการไต่ระดับของคุณจะบันทึกขึ้น Cloudflare Database โดยอัตโนมัติ</p>
+            </div>
+            
+            <form id="auth-form" style="display: flex; flex-direction: column; gap: 1rem; text-align: left;" onsubmit="event.preventDefault();">
+              <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                <label for="username-input" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">ชื่อผู้ใช้งาน (Username)</label>
+                <input type="text" id="username-input" class="search-input" placeholder="พิมพ์ชื่อผู้ใช้ภาษาอังกฤษ (เช่น milton12)" required minlength="3" maxlength="20" style="width: 100%;">
+              </div>
+              
+              <div id="auth-error-msg" style="color: var(--error-color); font-size: 0.8rem; font-weight: 500; display: none; background: rgba(239, 68, 68, 0.1); padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                ข้อความข้อผิดพลาด
+              </div>
+
+              <button type="submit" class="btn-action-primary" id="btn-auth-submit" style="width: 100%; padding: 0.85rem; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 0.5rem;">
+                <span>เข้าสู่ระบบ / เริ่มต้นใช้งาน</span> <i class="fa-solid fa-arrow-right-to-bracket"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+      
+      <!-- ================= SECTION 1: DASHBOARD ================= -->
+      <section id="dashboard" class="content-section">
+        <div class="dashboard-grid">
+          
+          <!-- Left Column: Welcome & Level Grid -->
+          <div class="dashboard-left">
+            <div class="welcome-banner">
+              <div class="welcome-text">
+                <h2>สวัสดีผู้เตรียมสอบ TOEIC ทุกคน! 👋</h2>
+                <p>ยินดีต้อนรับเข้าสู่ระบบเรียนรู้และตะลุยโจทย์เรื่อง <strong>Part of Speech (ประเภทของคำ)</strong> ซึ่งเป็นหัวข้อที่ออกสอบบ่อยที่สุดในหมวด Grammar ของข้อสอบ TOEIC พาร์ท 5 และ 6 เราได้รวบรวมแบบทดสอบ 5 ระดับความยาก (ตั้งแต่ระดับเริ่มต้นไปจนถึงระดับสูง) ชุดละ 20 ข้อ รวม 100 ข้อ มาให้คุณได้ท้าทายตนเอง</p>
+              </div>
+            </div>
+
+            <div class="level-list-header">
+              <i class="fa-solid fa-circle-nodes" style="color: var(--accent-color);"></i>
+              <span>เลเวลแบบทดสอบตามระดับความยาก (ไต่ระดับ)</span>
+            </div>
+
+            <div class="level-grid" id="levels-container">
+              <!-- Level cards will be generated by app.js -->
+            </div>
+          </div>
+
+          <!-- Right Column: Stats & Information -->
+          <div class="dashboard-right">
+            <!-- Overall progress circle -->
+            <div class="glass-panel progress-widget">
+              <h3 style="font-size: 1.1rem; font-weight:600;">ความสำเร็จโดยรวม</h3>
+              <div class="circle-progress-container">
+                <svg class="circle-svg">
+                  <circle class="circle-bg" cx="70" cy="70" r="65"></circle>
+                  <circle class="circle-bar" id="overall-progress-bar" cx="70" cy="70" r="65"></circle>
+                </svg>
+                <div class="circle-percentage" id="overall-percentage-text">0%</div>
+              </div>
+              <p style="font-size:0.8rem; color: var(--text-secondary);" id="progress-desc">ตอบถูก 0 จากทั้งหมด 100 ข้อ</p>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="stats-row">
+              <div class="stat-card">
+                <span class="stat-val" id="stat-tests-completed">0/5</span>
+                <span class="stat-label">ผ่านการทดสอบ</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-val" id="stat-accuracy">0%</span>
+                <span class="stat-label">ความถูกต้องเฉลี่ย</span>
+              </div>
+            </div>
+
+            <!-- TOEIC Weight Info -->
+            <div class="toeic-info-card">
+              <h3>สถิติข้อสอบ TOEIC</h3>
+              <p>ในข้อสอบ TOEIC Reading (พาร์ท 5 Incomplete Sentences และ พาร์ท 6 Text Completion) เรื่อง <strong>Part of Speech</strong> คิดเป็นสัดส่วนสูงที่สุดในหลักไวยากรณ์ทั้งหมด!</p>
+              
+              <div class="chart-container">
+                <div class="chart-bar-row">
+                  <div class="chart-bar-labels">
+                    <span>Part of Speech (Grammar)</span>
+                    <span>35% - 40%</span>
+                  </div>
+                  <div class="chart-bar-outer">
+                    <div class="chart-bar-inner" id="chart-bar-pos" style="--target-width: 40%"></div>
+                  </div>
+                </div>
+                
+                <div class="chart-bar-row">
+                  <div class="chart-bar-labels">
+                    <span>Tense / Agreement / Active-Passive</span>
+                    <span>25% - 30%</span>
+                  </div>
+                  <div class="chart-bar-outer">
+                    <div class="chart-bar-inner" id="chart-bar-verb" style="--target-width: 30%"></div>
+                  </div>
+                </div>
+
+                <div class="chart-bar-row">
+                  <div class="chart-bar-labels">
+                    <span>Vocabulary / Preposition & Conjunction</span>
+                    <span>30% - 35%</span>
+                  </div>
+                  <div class="chart-bar-outer">
+                    <div class="chart-bar-inner" id="chart-bar-vocab" style="--target-width: 35%"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <p style="margin-top: 1rem; margin-bottom: 0; font-size: 0.8rem; font-style: italic;">
+                * การวิเคราะห์อิงตามข้อสอบมาตรฐานปี 2026 การเข้าใจเรื่อง suffix และการจัดตำแหน่งคำ ช่วยตอบข้อสอบได้ภายใน 10-15 วินาทีต่อข้อโดยแทบไม่ต้องแปลความหมายทั้งหมด!
+              </p>
+            </div>
+          </div>
+          
+        </div>
+      </section>
+
+      <!-- ================= SECTION 2: STUDY GUIDE ================= -->
+      <section id="guide" class="content-section">
+        <div class="glass-panel">
+          <h2 style="font-size: 1.6rem; font-weight: 700; margin-bottom: 0.5rem;">คู่มือเตรียมตัวสอบเรื่อง Part of Speech</h2>
+          <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
+            เรียนรู้วิธีการสังเกตประเภทของคำด้วยเทคนิค Suffix (คำลงท้าย) และความเข้าใจในตำแหน่งภายในโครงสร้างประโยค เพื่อลดเวลาทำข้อสอบให้สั้นลง
+          </p>
+          
+          <div class="guide-tabs" id="guide-tabs-container">
+            <button class="guide-tab-btn active" data-tab="noun">Noun (คำนาม)</button>
+            <button class="guide-tab-btn" data-tab="verb">Verb (คำกริยา)</button>
+            <button class="guide-tab-btn" data-tab="adj">Adjective (คุณศัพท์)</button>
+            <button class="guide-tab-btn" data-tab="adv">Adverb (กริยาวิเศษณ์)</button>
+            <button class="guide-tab-btn" data-tab="pronoun">Pronoun (สรรพนาม)</button>
+            <button class="guide-tab-btn" data-tab="prep-conj">Prep & Conj (คำเชื่อม)</button>
+          </div>
+
+          <!-- Noun Tab -->
+          <div class="guide-tab-content active" id="tab-noun">
+            <div class="guide-grid">
+              <div class="guide-card">
+                <h3>ตำแหน่งของ Noun ในประโยค TOEIC</h3>
+                <ul class="strategy-list">
+                  <li><strong>เป็นประธาน (Subject):</strong> อยู่หน้ากริยาหลัก เช่น [<strong>The merger</strong> was approved.]</li>
+                  <li><strong>เป็นกรรม (Object):</strong> อยู่หลังกริยาแสดงอาการหรือหลังคำบุพบท เช่น [Mr. Peterson asked for <strong>permission</strong>.]</li>
+                  <li><strong>หลังคำนำหน้านาม (Articles / Determiners):</strong> หลัง a, an, the, this, that, these, those, many, some, all, etc.</li>
+                  <li><strong>หลังคำแสดงความเป็นเจ้าของ (Possessives):</strong> หลัง my, your, his, her, its, our, their, Mr. Harrison's</li>
+                  <li><strong>หลังคำคุณศัพท์ (Adjectives):</strong> ขยายด้วย Adjective เช่น [We need a <strong>qualified assistant</strong>.]</li>
+                </ul>
+              </div>
+              <div class="guide-card">
+                <h3>Suffixes ที่พบบ่อยของ Noun</h3>
+                <table class="suffix-table">
+                  <thead>
+                    <tr><th>Suffix</th><th>ความหมาย/การใช้</th><th>ตัวอย่างคำ</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><span class="suffix-tag">-tion / -sion</span></td><td>การกระทำ, สภาพ</td><td>production, decision, expansion</td></tr>
+                    <tr><td><span class="suffix-tag">-ment</span></td><td>การกระทำ, ผลลัพธ์</td><td>abandonment, development, agreement</td></tr>
+                    <tr><td><span class="suffix-tag">-ness</span></td><td>สภาวะ, ความเป็น...</td><td>darkness, quickness, carefulness</td></tr>
+                    <tr><td><span class="suffix-tag">-ity / -ty</span></td><td>คุณภาพ, สภาพ</td><td>anxiety, authority, security, conformity</td></tr>
+                    <tr><td><span class="suffix-tag">-er / -or / -ist</span></td><td>ผู้กระทำ, คน</td><td>manager, director, administrator, optimist</td></tr>
+                    <tr><td><span class="suffix-tag">-ance / -ence</span></td><td>สภาพ, สภาวะ</td><td>resistance, preference, performance</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Verb Tab -->
+          <div class="guide-tab-content" id="tab-verb">
+            <div class="guide-grid">
+              <div class="guide-card">
+                <h3>ตำแหน่งของ Verb ในประโยค TOEIC</h3>
+                <ul class="strategy-list">
+                  <li><strong>กริยาแท้ของประโยค (Main Verb):</strong> อยู่หลังประธาน เช่น [The manager <strong>wants</strong> to start...]</li>
+                  <li><strong>ตามหลังกริยาช่วย (Modal Verbs):</strong> หลัง will, would, can, could, should, must ในรูปเดิม (Base Form) เช่น [You should <strong>read</strong> the contract.]</li>
+                  <li><strong>ตามหลัง Infinitive Marker "to":</strong> ในรูปกริยาเดิมปราศจากตัวนำใดๆ เช่น [Decided to <strong>postpone</strong> the meeting.]</li>
+                  <li><strong>หลังกริยาช่วยอื่นๆ:</strong> เช่น do/does/did ในประโยคคำถามและปฏิเสธ</li>
+                </ul>
+              </div>
+              <div class="guide-card">
+                <h3>Suffixes ที่พบบ่อยของ Verb</h3>
+                <table class="suffix-table">
+                  <thead>
+                    <tr><th>Suffix</th><th>ความหมาย/การใช้</th><th>ตัวอย่างคำ</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><span class="suffix-tag">-ize / -ise</span></td><td>ทำให้เป็น..., ปรับใช้</td><td>systematize, itemize, organize</td></tr>
+                    <tr><td><span class="suffix-tag">-ify</span></td><td>ทำให้เกิด...</td><td>identify, clarify, simplify</td></tr>
+                    <tr><td><span class="suffix-tag">-ate</span></td><td>จัดทำ, ดำเนินการ</td><td>arbitrate, demonstrate, collaborate</td></tr>
+                    <tr><td><span class="suffix-tag">-en</span></td><td>ทำให้กลายเป็น...</td><td>deepen, shorten, strengthen</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Adjective Tab -->
+          <div class="guide-tab-content" id="tab-adj">
+            <div class="guide-grid">
+              <div class="guide-card">
+                <h3>ตำแหน่งของ Adjective ในประโยค TOEIC</h3>
+                <ul class="strategy-list">
+                  <li><strong>อยู่หน้าคำนาม (Attrib. Position):</strong> ขยายคำนามตามหลัง เช่น [a <strong>detailed</strong> report, <strong>creative</strong> team]</li>
+                  <li><strong>อยู่หลัง Linking Verbs:</strong> หลังกริยาเชื่อมโยง เช่น is, am, are, was, were, become, remain, seem, look เช่น [The manager remains <strong>optimistic</strong>. / The customer was very <strong>satisfied</strong>.]</li>
+                  <li><strong>อยู่หลังคำกริยาขยายกรรม (Object complement):</strong> เช่น make/keep/find + กรรม + Adjective เช่น [The update makes the server <strong>secure</strong>.]</li>
+                </ul>
+              </div>
+              <div class="guide-card">
+                <h3>Suffixes ที่พบบ่อยของ Adjective</h3>
+                <table class="suffix-table">
+                  <thead>
+                    <tr><th>Suffix</th><th>ความหมาย/การใช้</th><th>ตัวอย่างคำ</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><span class="suffix-tag">-ive / -sive</span></td><td>ที่แสดงถึง..., ที่เป็น...</td><td>effective, creative, representative</td></tr>
+                    <tr><td><span class="suffix-tag">-ful</span></td><td>เต็มไปด้วย..., น่า...</td><td>careful, tactful, tasteful</td></tr>
+                    <tr><td><span class="suffix-tag">-able / -ible</span></td><td>ซึ่งสามารถ...ได้</td><td>sustainable, enviable, legible</td></tr>
+                    <tr><td><span class="suffix-tag">-al</span></td><td>เกี่ยวกับ...</td><td>professional, unilateral, official</td></tr>
+                    <tr><td><span class="suffix-tag">-ed / -ing</span></td><td><strong>-ed:</strong> รู้สึก... / ถูกทำ<br><strong>-ing:</strong> น่า... / ขยายรูปประธาน</td><td>experienced, revised, detailed, exciting</td></tr>
+                    <tr><td><span class="suffix-tag">-ent / -ant</span></td><td>แสดงลักษณะสภาพ</td><td>permanent, consistent, resistant</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Adverb Tab -->
+          <div class="guide-tab-content" id="tab-adv">
+            <div class="guide-grid">
+              <div class="guide-card">
+                <h3>ตำแหน่งของ Adverb ในประโยค TOEIC</h3>
+                <ul class="strategy-list">
+                  <li><strong>ขยายกริยาหลัก (Verb):</strong> มักตั้งอยู่ท้ายประโยค (หลังกรรม), ก่อนหน้ากริยาหลัก หรือแทรกระหว่างกริยาช่วยและกริยาหลัก เช่น [The team completed the project <strong>successfully</strong>.]</li>
+                  <li><strong>ขยาย Adjective:</strong> วางอยู่หน้าคำคุณศัพท์โดยตรงเพื่อขยายน้ำหนัก เช่น [<strong>exceptionally</strong> impressive, <strong>highly</strong> qualified]</li>
+                  <li><strong>ขยาย Adverb ตัวอื่น:</strong> วางหน้า Adverb ที่มันต้องการจะขยาย เช่น [The system runs <strong>noticeably</strong> faster.]</li>
+                  <li><strong>ขยายทั้งประโยค:</strong> มักวางอยู่หน้าประโยคสุดแล้วคั่นด้วยเครื่องหมายจุลภาค เช่น [<strong>Fortunately</strong>, no data was lost during the outage.]</li>
+                </ul>
+              </div>
+              <div class="guide-card">
+                <h3>Suffix & ลักษณะคำวิเศษณ์</h3>
+                <table class="suffix-table">
+                  <thead>
+                    <tr><th>Suffix / รูปแบบ</th><th>ข้อควรระวังใน TOEIC</th><th>ตัวอย่างคำ</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><span class="suffix-tag">-ly</span></td><td>สร้างมาจาก Adjective + ly เพื่อให้เป็น Adverb ขยายกริยา</td><td>quickly, significantly, indissolubly</td></tr>
+                    <tr><td><span class="suffix-tag">Adj + ly ที่เป็น Noun</span></td><td>คำลงท้าย -ly บางตัวเป็น Adjective ไม่ใช่ Adverb เช่น costly (แพง), friendly (เป็นมิตร), timely (ทันเวลา)</td><td><strong>* ห้ามนำมาตอบในช่อง Adverb</strong></td></tr>
+                    <tr><td><span class="suffix-tag">Flat Adverbs</span></td><td>คำวิเศษณ์ที่รูปไม่เปลี่ยนและไม่ใช้ -ly เช่น hard (ขยัน/หนัก), fast (เร็ว), late (ช้า/สาย)</td><td>work <strong>hard</strong> (ไม่ใช่ hardly)</td></tr>
+                    <tr><td><span class="suffix-tag">คำที่สับสนง่าย</span></td><td><strong>shortly:</strong> แปลว่าเร็วๆ นี้/ในเวลาไม่นาน<br><strong>hardly:</strong> แปลว่าแทบจะไม่</td><td>will arrive <strong>shortly</strong></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pronoun Tab -->
+          <div class="guide-tab-content" id="tab-pronoun">
+            <div class="guide-grid">
+              <div class="guide-card">
+                <h3>ตารางสรุปคำสรรพนาม (Pronouns) ในข้อสอบ TOEIC</h3>
+                <table class="suffix-table">
+                  <thead>
+                    <tr><th>ประเภทสรรพนาม</th><th>หน้าที่ตำแหน่ง</th><th>ตัวอย่างการใช้ใน TOEIC</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><strong>Subject Pronoun</strong></td><td>ทำหน้าที่เป็นประธาน (อยู่หน้ากริยาแท้)</td><td><strong>He</strong> decided to accept the promotion offer.</td></tr>
+                    <tr><td><strong>Object Pronoun</strong></td><td>ทำหน้าที่เป็นกรรม (อยู่หลังกริยา/บุพบท)</td><td>Mr. Harrison asked <strong>him</strong> to assist.</td></tr>
+                    <tr><td><strong>Possessive Adjective</strong></td><td>แสดงความเป็นเจ้าของ (ต้องนำหน้านามเสมอ)</td><td>Thanks to <strong>their</strong> hard work.</td></tr>
+                    <tr><td><strong>Possessive Pronoun</strong></td><td>แสดงความเป็นเจ้าของ (ไม่ต้องมีนามตามหลัง)</td><td>The responsibilities are <strong>theirs</strong>.</td></tr>
+                    <tr><td><strong>Reflexive Pronoun</strong></td><td>สะท้อนประธานทำเอง (มักอยู่หลังกริยา/by/ท้ายประโยค)</td><td>They completed the process by <strong>themselves</strong>.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="guide-card">
+                <h3>จุดที่ออกสอบบ่อยในพาร์ท 5</h3>
+                <ul class="strategy-list">
+                  <li><strong>การเลือกรูปแสดงความเป็นเจ้าของ (Possessive Adj. vs Pronoun):</strong> ดูว่าหลังช่องว่างมีคำนามหรือไม่ หากมีนาม (เช่น ... report) ต้องตอบ Possessive Adjective เช่น <strong>their</strong> report แต่หากไม่มีคำนามมารองรับเลย ต้องใช้ Possessive Pronoun เช่น The report is <strong>theirs</strong>.</li>
+                  <li><strong>Reflexive Pronouns:</strong> นำมาใช้แสดงถึงการกระทำตัวคนเดียวโดยไม่มีคนอื่นช่วย มักตั้งอยู่ท้ายประโยคเดี่ยวๆ หรืออยู่หลังคำว่า 'by' เช่น [He resolved the server issues by <strong>himself</strong>.] หรือวางไว้ติดประธานเพื่อเน้นย้ำตัวบุคคล [The CEO <strong>himself</strong> will present.]</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prep & Conj Tab -->
+          <div class="guide-tab-content" id="tab-prep-conj">
+            <div class="guide-grid">
+              <div class="guide-card">
+                <h3>บุพบท (Preposition) vs. คำเชื่อม (Conjunction)</h3>
+                <p style="font-size:0.85rem; line-height: 1.5; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                  ในข้อสอบ TOEIC มักออกโจทย์ให้เลือกระหว่างตัวเลือกที่มีความหมายเดียวกัน แต่มีไวยากรณ์แตกต่างกัน เช่น บอกเหตุผล (เพราะว่า) หรือบอกความขัดแย้ง (ทั้งๆ ที่) หลักการเลือกง่ายๆ คือ:
+                </p>
+                <ul class="strategy-list">
+                  <li><strong>คำเชื่อม (Conjunction):</strong> จะต้องตามด้วย **ประโยคสมบูรณ์ (Clause)** ที่มีโครงสร้าง [ประธาน + กริยาแท้]</li>
+                  <li><strong>บุพบท (Preposition):</strong> จะต้องตามด้วย **คำนาม (Noun)** หรือ **กลุ่มคำนาม (Noun Phrase)** หรือ **กริยาเติม -ing (Gerund)** เท่านั้น (ห้ามมีกริยาแท้)</li>
+                </ul>
+              </div>
+              <div class="guide-card">
+                <h3>ตารางเปรียบเทียบที่มักออกสอบ</h3>
+                <table class="suffix-table">
+                  <thead>
+                    <tr><th>ความหมาย</th><th>ตามด้วย Clause (+ Subject + Verb)</th><th>ตามด้วย Noun / Noun Phrase</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><strong>เพราะว่า (Reason)</strong></td><td>because, since, as</td><td>because of, due to, owing to, on account of</td></tr>
+                    <tr><td><strong>แม้ว่า/ทั้งๆ ที่ (Concession)</strong></td><td>although, even though, though</td><td>despite, in spite of, notwithstanding</td></tr>
+                    <tr><td><strong>ในระหว่าง (Time)</strong></td><td>while, as</td><td>during, for</td></tr>
+                    <tr><td><strong>ยกเว้นว่า / นอกจาก</strong></td><td>unless</td><td>except, bar, pending</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================= SECTION 3: YOUTUBE HUB ================= -->
+      <section id="videos" class="content-section">
+        <div class="glass-panel">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap: 1rem; margin-bottom: 1.5rem;">
+            <div>
+              <h2 style="font-size: 1.6rem; font-weight: 700; margin-bottom: 0.25rem;">คลังวิดีโอรวมติวเรื่อง Part of Speech</h2>
+              <p style="color: var(--text-secondary); font-size: 0.95rem;">รวบรวมคลิปติวฟรีคุณภาพสูงจากติวเตอร์ชื่อดังในไทยสำหรับเตรียมสอบ TOEIC Grammar</p>
+            </div>
+            
+            <div class="youtube-search-bar" style="margin-bottom:0;">
+              <input type="text" id="video-search-input" class="search-input" placeholder="ค้นหาตามชื่อคลิป หรือติวเตอร์...">
+            </div>
+          </div>
+          
+          <div class="video-grid" id="videos-container">
+            <!-- Video cards will be injected by app.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SECTION 4: QUIZ INTERFACE (FOCUS MODE) ================= -->
+      <section id="quiz" class="content-section">
+        <div class="glass-panel">
+          
+          <div class="quiz-header">
+            <div class="quiz-title-info">
+              <h2 id="quiz-level-title">แบบทดสอบระดับ Level 1: A1-A2 (Beginner)</h2>
+              <p style="font-size: 0.85rem; color: var(--text-secondary);" id="quiz-level-desc">พื้นฐาน Part of Speech: Suffix ทั่วไปและไวยากรณ์โครงสร้างประโยคระดับต้น</p>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <button class="btn-flag" id="btn-flag-question">
+                <i class="fa-regular fa-flag"></i>
+                <span>ปักหมุดข้อนี้</span>
+              </button>
+              
+              <div class="quiz-timer" id="quiz-timer-display">
+                <i class="fa-solid fa-clock"></i>
+                <span id="timer-text">20:00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="quiz-progress-wrapper">
+            <div class="quiz-progress-info">
+              <span>ความคืบหน้าการทำข้อสอบ</span>
+              <span id="progress-numerical">ข้อ 1 จาก 20 ข้อ</span>
+            </div>
+            <div class="quiz-progress-outer">
+              <div class="quiz-progress-inner" id="quiz-progress-fill"></div>
+            </div>
+          </div>
+
+          <!-- Quiz layout (Split panel) -->
+          <div class="quiz-layout">
+            
+            <!-- Left: Question & Answers -->
+            <div class="quiz-main">
+              <div class="question-card">
+                <div class="question-text" id="quiz-question-text">
+                  Question text template here
+                </div>
+                
+                <div class="options-list" id="quiz-options-container">
+                  <!-- Options will be generated dynamically -->
+                </div>
+              </div>
+              
+              <div class="quiz-controls">
+                <button class="btn-quiz-nav" id="btn-quiz-prev" disabled>
+                  <i class="fa-solid fa-arrow-left"></i> ย้อนกลับ
+                </button>
+                <button class="btn-quiz-nav" id="btn-quiz-next">
+                  ถัดไป <i class="fa-solid fa-arrow-right"></i>
+                </button>
+                <button class="btn-submit-quiz" id="btn-quiz-submit" style="display:none;">
+                  <i class="fa-solid fa-check-double"></i> ส่งกระดาษคำตอบ
+                </button>
+              </div>
+            </div>
+
+            <!-- Right: Grid map navigation -->
+            <div class="quiz-sidebar">
+              <span class="sidebar-title">แผงผังข้อสอบ (20 ข้อ)</span>
+              <div class="quiz-jump-grid" id="quiz-jump-buttons">
+                <!-- Jump buttons will be generated by app.js -->
+              </div>
+              
+              <div style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
+                <p style="font-size:0.75rem; color: var(--text-secondary); display:flex; align-items:center; gap:0.5rem; margin-bottom: 0.35rem;">
+                  <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--accent-color);"></span> ตอบแล้ว
+                </p>
+                <p style="font-size:0.75rem; color: var(--text-secondary); display:flex; align-items:center; gap:0.5rem; margin-bottom: 0.35rem;">
+                  <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--panel-bg); border:1px solid var(--border-color);"></span> ยังไม่ได้ตอบ
+                </p>
+                <p style="font-size:0.75rem; color: var(--text-secondary); display:flex; align-items:center; gap:0.5rem;">
+                  <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--warning-color);"></span> ปักหมุดทบทวน
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================= SECTION 5: QUIZ RESULTS ================= -->
+      <section id="results" class="content-section">
+        <!-- Result Summary Card -->
+        <div class="results-summary-card">
+          <div class="results-badge-container" id="results-badge">
+            <span class="results-score" id="results-score-text">18/20</span>
+            <span class="results-score-lbl" id="results-percent-text">90%</span>
+          </div>
+          
+          <h2 class="results-msg-title" id="results-message-title">🎉 ยินดีด้วย! คุณสอบผ่านระดับนี้</h2>
+          <p class="results-msg-desc" id="results-message-desc">คุณได้คะแนนเกินเกณฑ์ 14/20 (70%) ระบบได้ปลดล็อกแบบทดสอบระดับถัดไปให้คุณเรียนรู้ต่อยอดเรียบร้อยแล้ว!</p>
+          
+          <div class="results-action-row">
+            <button class="btn-action-primary" id="btn-results-next-level">
+              <i class="fa-solid fa-circle-arrow-up"></i> ไปต่อเลเวลถัดไป
+            </button>
+            <button class="btn-action-secondary" id="btn-results-retry">
+              <i class="fa-solid fa-rotate-left"></i> ทดสอบระดับเดิมอีกครั้ง
+            </button>
+            <button class="btn-action-secondary" id="btn-results-dashboard">
+              <i class="fa-solid fa-house"></i> กลับหน้าแดชบอร์ด
+            </button>
+          </div>
+        </div>
+
+        <!-- Detailed Review Section -->
+        <div class="glass-panel">
+          <div class="review-header">
+            <span><i class="fa-solid fa-clipboard-check" style="color:var(--accent-color);"></i> เฉลยและวิเคราะห์คำตอบอย่างละเอียด</span>
+            
+            <div class="review-filter-row">
+              <button class="review-filter-btn active" data-filter="all">ทั้งหมด (20)</button>
+              <button class="review-filter-btn" data-filter="correct">ตอบถูก (0)</button>
+              <button class="review-filter-btn" data-filter="incorrect">ตอบผิด (0)</button>
+            </div>
+          </div>
+          
+          <div class="review-list" id="review-questions-container">
+            <!-- Review items will be generated by app.js -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      <p>© 2026 TOEIC Part of Speech Mastery System. พัฒนาขึ้นด้วยเทคโนโลยีเว็บพรีเมียมแบบไม่มี dependencies</p>
+      <p style="margin-top: 0.5rem;">จัดทำขึ้นเพื่อการเตรียมตัวสอบพาร์ท 5 และ 6 โครงสร้างข้อสอบอิงตามมาตรฐานปี 2026</p>
+    </footer>
+
+  </div>
+
+  <!-- ================= YOUTUBE PLAY MODAL ================= -->
+  <div class="modal-overlay" id="youtube-modal">
+    <div class="modal-content">
+      <button class="modal-close-btn" id="btn-close-modal" title="ปิดหน้าต่าง">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      
+      <div class="modal-video-wrapper">
+        <div id="youtube-player-container">
+          <!-- iframe will be loaded here dynamically -->
+        </div>
+      </div>
+      
+      <div class="modal-details">
+        <h3 class="modal-title" id="modal-video-title">คลิปวิดีโอสรุปหลักการ</h3>
+        <p class="modal-desc" id="modal-video-desc">คำอธิบายวิดีโอและหัวข้อสำคัญในการติว</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load javascripts -->
+  <script src="questions.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
