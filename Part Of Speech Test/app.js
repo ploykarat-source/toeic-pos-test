@@ -452,7 +452,8 @@ function renderDashboard() {
       <span class="level-status-tag">${statusLabel}</span>
       <button class="btn-start-level" ${isUnlocked ? "" : "disabled"} data-level="${lvlId}">
         <i class="fa-solid ${isPassed ? "fa-rotate-left" : "fa-play"}"></i> 
-        <span>${isPassed ? "ทำใหม่" : (score !== null ? "แก้มือ" : "เริ่มทำ")}</span>
+        <span>${isPassed ? "แก้มือ" : (score !== null && score !== undefined ? "แก้มือ" : "เริ่มทดสอบ")}</span>
+
       </button>
     `;
     
