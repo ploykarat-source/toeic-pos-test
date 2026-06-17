@@ -1,0 +1,4 @@
+[[d1_databases]]
+binding = "DB"
+database_name = "toeic-pos-db"
+database_id = "5c03000a4dcbf402856f7cc5f2e10146"
