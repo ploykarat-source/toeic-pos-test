@@ -434,7 +434,8 @@ function renderDashboard() {
       badgeClass = "passed";
     } else if (isUnlocked) {
       statusClass = "unlocked";
-      statusLabel = score !== null ? `ยังไม่ผ่าน (${score}/20)` : "พร้อมทดสอบ";
+      statusLabel = score !== null && score > 0 ? `ยังไม่ผ่าน (${score}/20)` : "พร้อมทดสอบ";
+
       badgeClass = "unlocked";
     }
     
@@ -452,7 +453,8 @@ function renderDashboard() {
       <span class="level-status-tag">${statusLabel}</span>
       <button class="btn-start-level" ${isUnlocked ? "" : "disabled"} data-level="${lvlId}">
         <i class="fa-solid ${isPassed ? "fa-rotate-left" : "fa-play"}"></i> 
-        <span>${isPassed ? "ทำใหม่" : (score !== null ? "แก้มือ" : "เริ่มทำ")}</span>
+        <span>${isPassed ? "ทำใหม่" : (statusLabel.includes("ยังไม่ผ่าน") ? "แก้มือ" : "เริ่มทำ")}</span>
+
 
       </button>
     `;
