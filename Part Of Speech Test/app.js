@@ -842,9 +842,6 @@ async function submitQuiz() {
 
   // Show Results Screen
   renderResults(correctCount, passed);
-}
-  renderResults(correctCount, passed);
-}
 
 // --- RESULTS SCREEN RENDERER ---
 function renderResults(score, passed) {
