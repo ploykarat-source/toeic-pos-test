@@ -23,10 +23,10 @@ export async function onRequestPost(context) {
     if (event.type === "message" && event.message.type === "image") {
       const messageId = event.message.id;
 
-      // แจ้งลูกค้าล่วงหน้าว่ากำลังตรวจสอบสลิปเพื่อไม่ให้ลูกค้ารออย่างกังวล
-      await sendLineReply(LINE_ACCESS_TOKEN, replyToken, "ได้รับรูปภาพแล้วครับ 🤖 ระบบกำลังตรวจสอบสลิปการโอนเงินของท่าน กรุณารอสักครู่...");
+           // แจ้งลูกค้าล่วงหน้าว่ากำลังตรวจสอบสลิปเพื่อไม่ให้ลูกค้ารออย่างกังวล (อัปเดตระบบล็อกส่งสลับข้อความ)
+      await sendLineReply(LINE_ACCESS_TOKEN, replyToken, "ได้รับรูปภาพแล้วครับ 🤖 ระบบ AI กำลังตรวจสอบสลิปการโอนเงินของท่าน กรุณารอสักครู่...");
 
-            // 3. ไปดาวน์โหลดไฟล์รูปภาพสลิปมาจากเซิร์ฟเวอร์ของ LINE (เวอร์ชันอัปเดตสิทธิ์ใหม่)
+      // 3. ไปดาวน์โหลดไฟล์รูปภาพสลิปมาจากเซิร์ฟเวอร์ของ LINE (เวอร์ชันอัปเดตสิทธิ์ใหม่ผ่านฉลุย)
       const lineMediaUrl = `https://line.me{messageId}/content`;
       const lineResponse = await fetch(lineMediaUrl, {
         method: "GET",
@@ -37,15 +37,15 @@ export async function onRequestPost(context) {
       });
 
       if (!lineResponse.ok) {
-        // หากดาวน์โหลดไม่ผ่าน ให้บอตส่งสัญญาณเตือนเข้าไลน์ทันทีเพื่อไม่ให้ระบบค้างเงียบ
         const errText = await lineResponse.text();
-        await sendLineReply(LINE_ACCESS_TOKEN, replyToken, `❌ เกิดข้อผิดพลาดในการโหลดรูปภาพจาก LINE (Error: ${lineResponse.status}). กรุณาติดต่อแอดมินครับ`);
+        await sendLinePush(LINE_ACCESS_TOKEN, event.source.userId, `❌ ระบบขัดข้อง: ดึงรูปภาพจาก LINE ไม่สำเร็จ (Status: ${lineResponse.status})`);
         throw new Error(`ดาวน์โหลดรูปภาพจาก LINE ไม่สำเร็จ: ${errText}`);
       }
 
-      // แปลงไฟล์รูปภาพให้เป็น ArrayBuffer เพื่อความเสถียรในการส่งต่อให้ AI
+      // แปลงไฟล์รูปภาพให้เป็น ArrayBuffer เพื่อส่งต่อเข้าถังประมวลผล AI ได้อย่างสมบูรณ์
       const imageBuffer = await lineResponse.arrayBuffer();
       const imageBlob = new Blob([imageBuffer], { type: "image/jpeg" });
+
 
 
       // 4. ส่งไฟล์รูปภาพนี้ต่อไปให้ AI ของ SlipOK ตรวจสอบความถูกต้อง
