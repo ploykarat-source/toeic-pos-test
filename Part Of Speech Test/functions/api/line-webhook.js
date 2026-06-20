@@ -26,17 +26,27 @@ export async function onRequestPost(context) {
       // แจ้งลูกค้าล่วงหน้าว่ากำลังตรวจสอบสลิปเพื่อไม่ให้ลูกค้ารออย่างกังวล
       await sendLineReply(LINE_ACCESS_TOKEN, replyToken, "ได้รับรูปภาพแล้วครับ 🤖 ระบบกำลังตรวจสอบสลิปการโอนเงินของท่าน กรุณารอสักครู่...");
 
-      // 3. ไปดาวน์โหลดไฟล์รูปภาพสลิปมาจากเซิร์ฟเวอร์ของ LINE
+            // 3. ไปดาวน์โหลดไฟล์รูปภาพสลิปมาจากเซิร์ฟเวอร์ของ LINE (เวอร์ชันอัปเดตสิทธิ์ใหม่)
       const lineMediaUrl = `https://line.me{messageId}/content`;
       const lineResponse = await fetch(lineMediaUrl, {
-        headers: { Authorization: `Bearer ${LINE_ACCESS_TOKEN}` }
+        method: "GET",
+        headers: { 
+          "Authorization": `Bearer ${LINE_ACCESS_TOKEN}`,
+          "User-Agent": "CloudflarePagesFunction"
+        }
       });
 
       if (!lineResponse.ok) {
-        throw new Error("ดาวน์โหลดรูปภาพจาก LINE ไม่สำเร็จ");
+        // หากดาวน์โหลดไม่ผ่าน ให้บอตส่งสัญญาณเตือนเข้าไลน์ทันทีเพื่อไม่ให้ระบบค้างเงียบ
+        const errText = await lineResponse.text();
+        await sendLineReply(LINE_ACCESS_TOKEN, replyToken, `❌ เกิดข้อผิดพลาดในการโหลดรูปภาพจาก LINE (Error: ${lineResponse.status}). กรุณาติดต่อแอดมินครับ`);
+        throw new Error(`ดาวน์โหลดรูปภาพจาก LINE ไม่สำเร็จ: ${errText}`);
       }
 
-      const imageBlob = await lineResponse.blob();
+      // แปลงไฟล์รูปภาพให้เป็น ArrayBuffer เพื่อความเสถียรในการส่งต่อให้ AI
+      const imageBuffer = await lineResponse.arrayBuffer();
+      const imageBlob = new Blob([imageBuffer], { type: "image/jpeg" });
+
 
       // 4. ส่งไฟล์รูปภาพนี้ต่อไปให้ AI ของ SlipOK ตรวจสอบความถูกต้อง
       const formData = new FormData();
