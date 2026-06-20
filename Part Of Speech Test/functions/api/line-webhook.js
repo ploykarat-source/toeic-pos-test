@@ -16,6 +16,11 @@ export async function onRequestPost(context) {
       return new Response("No events", { status: 200 });
     }
 
+      if (!data.events || data.events.length === 0) {
+      return new Response("No events", { status: 200 });
+    }
+
+    // 💡 ปรับมาดึงตำแหน่งที่ [0] เพื่อแกะพัสดุชิ้นแรกออกมาให้ถูกต้องตามโครงสร้างของ LINE
     const event = data.events[0];
     const replyToken = event.replyToken;
 
