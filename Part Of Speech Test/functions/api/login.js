@@ -29,7 +29,7 @@ export async function onRequestPost(context) {
 
     // ถ้าไม่เจอรหัสนี้ในฐานข้อมูล (แปลว่ารหัสผิด หรือ ยังไม่ได้จ่ายเงิน) ให้ส่งข้อความปฏิเสธกลับไปทันที
     if (!user) {
-      return new Response(JSON.stringify({ error: "รหัสเข้าใช้งานไม่ถูกต้อง หรือ ยังไม่ได้เปิดสิทธิ์ชำระเงิน" }), {
+      return new Response(JSON.stringify({ error: "รหัสเข้าใช้งานไม่ถูกต้อง หรือ ยังไม่ได้ชำระเงิน" }), {
         status: 400,
         headers: { 
           "Content-Type": "application/json; charset=utf-8",
