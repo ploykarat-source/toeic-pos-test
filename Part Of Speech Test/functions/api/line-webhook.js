@@ -12,15 +12,11 @@ export async function onRequestPost(context) {
     const bodyText = await request.text();
     const data = JSON.parse(bodyText);
 
-    if (!data.events || data.events.length === 0) {
+  if (!data.events || data.events.length === 0) {
       return new Response("No events", { status: 200 });
     }
 
-      if (!data.events || data.events.length === 0) {
-      return new Response("No events", { status: 200 });
-    }
-
-    // 💡 ปรับมาดึงตำแหน่งที่ [0] เพื่อแกะพัสดุชิ้นแรกออกมาให้ถูกต้องตามโครงสร้างของ LINE
+    // 💡 แกะพัสดุชิ้นแรกออกจาก Array ของ LINE ให้ถูกต้อง
     const event = data.events[0];
     const replyToken = event.replyToken;
 
@@ -28,10 +24,10 @@ export async function onRequestPost(context) {
     if (event.type === "message" && event.message.type === "image") {
       const messageId = event.message.id;
 
-           // แจ้งลูกค้าล่วงหน้าว่ากำลังตรวจสอบสลิปเพื่อไม่ให้ลูกค้ารออย่างกังวล (อัปเดตระบบล็อกส่งสลับข้อความ)
+      // แจ้งลูกค้าล่วงหน้าว่ากำลังตรวจสอบสลิปเพื่อไม่ให้ลูกค้ารออย่างกังวล
       await sendLineReply(LINE_ACCESS_TOKEN, replyToken, "ได้รับรูปภาพแล้วครับ 🤖 ระบบ AI กำลังตรวจสอบสลิปการโอนเงินของท่าน กรุณารอสักครู่...");
 
-      // 3. ไปดาวน์โหลดไฟล์รูปภาพสลิปมาจากเซิร์ฟเวอร์ของ LINE (เวอร์ชันอัปเดตสิทธิ์ใหม่ผ่านฉลุย)
+         // 3. ไปดาวน์โหลดไฟล์รูปภาพสลิปมาจากเซิร์ฟเวอร์ของ LINE (เวอร์ชันอัปเดตสิทธิ์และเครื่องหมายที่ถูกต้อง)
       const lineMediaUrl = `https://line.me{messageId}/content`;
       const lineResponse = await fetch(lineMediaUrl, {
         method: "GET",
